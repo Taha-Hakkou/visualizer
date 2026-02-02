@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var width, height int = 0, 0
+
 // ---------- MAIN ----------
 func main() {
 	for _, p := range rooms {
@@ -29,7 +31,6 @@ func main() {
 	}
 
 	// ---------- CANVAS ----------
-	width, height := 0, 0
 	for _, p := range pos {
 		if p.x > width {
 			width = p.x
@@ -38,8 +39,9 @@ func main() {
 			height = p.y
 		}
 	}
-	width += 10
-	height += 5 // adding to width and height in case some lines go beyond !
+	// min to add. why ????
+	width += 3
+	height += 1 // adding to width and height in case some lines go beyond !
 
 	canvas := make([][]rune, height)
 	for i := range canvas {

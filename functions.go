@@ -1,14 +1,13 @@
 package main
 
 func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
-
 	// 1) Horizontal segment
 	if y1 == y2 {
 		step := 1
 		if x2 < x1 {
 			step = -1
 		}
-		for x := x1; x != x2; x += step {
+		for x := x1 + 1; x != x2; x += step {
 			if canvas[y1][x] == ' ' {
 				canvas[y1][x] = '-'
 			}
@@ -22,7 +21,7 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		if y2 < y1 {
 			step = -1
 		}
-		for y := y1 + step; y != y2+step; y += step {
+		for y := y1 + 1; y != y2; y += step {
 			if canvas[y][x2+1] == ' ' {
 				canvas[y][x2+1] = '|'
 			}
@@ -31,33 +30,92 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 	}
 
 	// 3)
-	// underscores (in case starting with underscores - can be pipes)
-	xstep := 1
-	if x2 < x1 {
-		xstep = -1
+	if y2 < y1 {
+		y1, y2 = y2, y1
+		x1, x2 = x2, x1
+	} // now y1 is always bigger than y2
+
+	var x int = x1
+	var y int = y1
+
+	var startWithPipes bool
+	if y1+y2 > height || x1+x2 > width {
+		// works in 3 quarters of the map
+		// when using "and", will work only on 1 quarter
+		startWithPipes = true
 	}
-	x := x1
-	for ; (x2-x)/(y2-y1) != 0; x += xstep { // x != x2
-		if canvas[y1][x] == ' ' {
-			canvas[y1][x] = '_'
+	if startWithPipes {
+	} else {
+		// underscores
+		if x2 > x1 {
+			for ; x2-x != y2-y1; x++ {
+				if canvas[y1][x+1] == ' ' {
+					canvas[y1][x+1] = '_'
+				}
+			}
+		} else {
+			for ; x2-x != y1-y2; x-- { // (x2-x)/(y2-y1) != -1
+				if canvas[y1][x] == ' ' {
+					canvas[y1][x] = '_'
+				}
+			}
 		}
 	}
 
 	// slashes & backslashes
-	// y := y1
-	// ystep := xstep
-	// if x2-x == y-y2 {
-	// 	ystep = -xstep
-	// }
-	// for ; x != x2; x += xstep { // (x2-x)/(y2-y) != 0
-	// 	if canvas[y][x] == ' ' {
-	// 		canvas[y][x] = '/'
-	// 	}
-	// 	y += ystep // can be different of x (and use backslash)
-	// }
+	if x2 > x1 {
+		if canvas[y][x] == '_' {
+			x++
+			if y2 > y1 {
+				y++
+			} else {
+				y--
+			}
+		}
+		for ; y != y2+1; x++ {
+			if canvas[y][x] == ' ' || canvas[y][x] == '_' {
+				canvas[y][x] = '\\'
+			}
+			if y2 > y1 {
+				y++
+			} else {
+				y--
+			}
+		}
+	} else {
+		tx := x
+		for ; y != y2+1; x-- {
+			if canvas[y][x+1] == ' ' || canvas[y][x+1] == '_' && tx != x {
+				canvas[y][x+1] = '/'
+			}
+			if y2 > y1 {
+				y++
+			} else {
+				y--
+			}
+		}
+	}
 
 	// pipes
-
+	if startWithPipes {
+		// underscores
+		if x2 > x1 {
+			x--
+			for ; x < x2; x++ {
+				if canvas[y2][x] == ' ' {
+					canvas[y2][x] = '_'
+				}
+			}
+		} else {
+			x++
+			for ; x > x2; x-- {
+				if canvas[y2][x] == ' ' {
+					canvas[y2][x] = '_'
+				}
+			}
+		}
+	} else {
+	}
 	// // 3) Vertical or diagonal turn
 	// if y1 == y2 {
 	// 	return
@@ -72,5 +130,11 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 	// if canvas[y1][x2] == ' ' {
 	// 	canvas[y1][x2] = turnChar
 	// }
+}
 
+func abs(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
 }

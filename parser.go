@@ -1,32 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"os"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
-func getData() {
-	// check whether stdin is coming from a pipe/file or from a terminal (TTY)
-	stat, _ := os.Stdin.Stat()
-	isPiped := (stat.Mode() & os.ModeCharDevice) == 0
-
-	if !isPiped || len(os.Args) > 1 {
-		fmt.Println("Usage: ./lem-in [FILE] | ./visualizer")
-		return
-	}
-
-	bytes, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		panic(err) // why panic ?
-	}
-	lines := strings.Split(string(bytes), "\n")
-
-	// need to check global error of lem-in
-
+func parseData(lines []string) {
 	// Number of ants
 	// n, _ = strconv.Atoi(lines[0])
 

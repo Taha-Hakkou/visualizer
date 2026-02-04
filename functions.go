@@ -35,8 +35,7 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		x1, x2 = x2, x1
 	} // now y1 is always bigger than y2
 
-	var x int = x1
-	var y int = y1
+	var x, y int = x1, y1
 
 	var startWithPipes bool
 	if y1+y2 > height || x1+x2 > width {
@@ -44,7 +43,19 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		// when using "and", will work only on 1 quarter
 		startWithPipes = true
 	}
+
+	// 3.1
 	if startWithPipes {
+		// pipes
+		abs := x2 - x1
+		if abs < 0 {
+			abs *= -1
+		}
+		for ; y2-y > abs; y++ { // is it a valid condition ?
+			if canvas[y][x] == ' ' {
+				canvas[y][x] = '|'
+			}
+		}
 	} else {
 		// underscores
 		if x2 > x1 {
@@ -62,6 +73,7 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		}
 	}
 
+	// 3.2
 	// slashes & backslashes
 	if x2 > x1 {
 		if canvas[y][x] == '_' {
@@ -96,7 +108,7 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		}
 	}
 
-	// pipes
+	// 3.3
 	if startWithPipes {
 		// underscores
 		if x2 > x1 {
@@ -115,7 +127,14 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 			}
 		}
 	} else {
+		// pipes
+		for ; y < y2; y++ {
+			if canvas[y][x] == ' ' {
+				canvas[y][x] = '|'
+			}
+		}
 	}
+
 	// // 3) Vertical or diagonal turn
 	// if y1 == y2 {
 	// 	return
@@ -130,11 +149,4 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 	// if canvas[y1][x2] == ' ' {
 	// 	canvas[y1][x2] = turnChar
 	// }
-}
-
-func abs(n int) int {
-	if n < 0 {
-		return -n
-	}
-	return n
 }

@@ -8,6 +8,8 @@ var width, height int = 0, 0
 
 // ---------- MAIN ----------
 func main() {
+	getData()
+
 	for _, p := range rooms {
 		if p.x < minX {
 			minX = p.x
@@ -23,11 +25,11 @@ func main() {
 		}
 	}
 
-	pos := make(map[int]Point)
+	pos := make(map[string]Room)
 	for id, p := range rooms {
 		gx := (p.x - minX) * scale
 		gy := (p.y - minY) * scale // to invert Y, use (maxY - p.y) instead
-		pos[id] = Point{gx, gy}
+		pos[id] = Room{gx, gy}     // is id converted implicitly ???
 	}
 
 	// ---------- CANVAS ----------
@@ -55,7 +57,7 @@ func main() {
 
 	// ---------- DRAW ROOMS ----------
 	for id, p := range pos {
-		label := fmt.Sprintf("[%d]", id)
+		label := fmt.Sprintf("[%s]", id)
 		for i, ch := range label {
 			canvas[p.y][p.x+i] = ch
 		}

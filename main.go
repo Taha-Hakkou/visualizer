@@ -76,6 +76,9 @@ func main() {
 	// ---------- DRAW ROOMS ----------
 	for id, p := range pos {
 		label := fmt.Sprintf("[%s]", id)
+		// if id == start {
+		// 	label = "\033[31m" + label + "\033[0m" // ansi red
+		// }
 		for i, ch := range label {
 			canvas[p.y][p.x+i] = ch
 		}
@@ -88,8 +91,22 @@ func main() {
 		drawLine(canvas, p1.x, p1.y, p2.x, p2.y)
 	}
 
+	Animate(canvas)
+}
+
+func Animate(canvas [][]rune) { // steps is global, make canvas global also !
+	// for _, step := range steps {
+
+	// }
+	flush(canvas)
+}
+
+func flush(canvas [][]rune) {
 	// ---------- PRINT ----------
 	for _, row := range canvas {
-		fmt.Println(string(row))
+		line := string(row)
+		line = strings.Replace(line, "["+start+"]", "\033[31m"+"["+start+"]"+"\033[0m", 1) // red ansi
+		line = strings.Replace(line, "["+end+"]", "\033[32m"+"["+end+"]"+"\033[0m", 1)     // green ansi
+		fmt.Println(line)
 	}
 }

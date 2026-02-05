@@ -3,14 +3,16 @@ package main
 import (
 	"regexp"
 	"strconv"
+	"strings"
 )
+
+var start, end string
 
 func parseData(lines []string) {
 	// Number of ants
 	// n, _ = strconv.Atoi(lines[0])
 
 	var i int
-	// var start, end string
 
 	// recheck regex: surrounding spaces
 	roomex := regexp.MustCompile(`^([A-Za-z0-9]+) ([0-9]+) ([0-9]+)$`)
@@ -22,9 +24,9 @@ func parseData(lines []string) {
 			rooms[groups[1]] = Room{x, y}
 			// fmt.Println(lines[i])
 		} else if lines[i] == "##start" {
-			// start = lines[i+1]
+			start = strings.Split(lines[i+1], " ")[0]
 		} else if lines[i] == "##end" {
-			// end = lines[i+1]
+			end = strings.Split(lines[i+1], " ")[0]
 		} else {
 			break
 		}
@@ -43,14 +45,16 @@ func parseData(lines []string) {
 		}
 	}
 
-	// 	// movex := regexp.MustCompile(`^L[0-9]-[0-9]( (L[0-9]-[0-9])*)$`)
-	// 	// for ; i < len(lines); i++ {
-	// 	// 	if movex.MatchString(lines[i]) { // contains and not match
-	// 	// 		fmt.Println(lines[i])
-	// 	// 	}
-	// 	// }
-
-	// fmt.Println(n)
-	// fmt.Println(start)
-	// fmt.Println(end)
+	i++ // skip empty line
+	stepx := regexp.MustCompile(`L([A-Za-z0-9]+)-([A-Za-z0-9]+)`)
+	for ; i < len(lines); i++ {
+		// no need to check if matching anymore
+		moves := stepx.FindAllStringSubmatch(lines[i], -1)
+		newMoves := make([][2]string, len(moves))
+		for j, move := range moves {
+			newMoves[j] = [2]string{move[1], move[2]}
+		}
+		steps = append(steps, newMoves)
+		// fmt.Println(newMoves)
+	}
 }

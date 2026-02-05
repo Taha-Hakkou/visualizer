@@ -16,6 +16,9 @@ var rooms = map[string]Room{}
 // Links
 var links = [][2]string{}
 
+// Steps
+var steps = [][][2]string{}
+
 // ---------- NORMALIZE ----------
 var (
 	width, height int

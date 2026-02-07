@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 // ---------- MAIN ----------
@@ -95,10 +96,16 @@ func main() {
 }
 
 func Animate(canvas [][]rune) { // steps is global, make canvas global also !
-	// for _, step := range steps {
-
-	// }
 	flush(canvas)
+	for _, step := range steps {
+		for _, move := range step {
+			room1 := rooms[move[0]]
+			room2 := rooms[move[1]]
+			drawMove(canvas, room1.x, room1.y, room2.x, room2.y)
+		}
+		time.Sleep(time.Second)
+		flush(canvas)
+	}
 }
 
 func flush(canvas [][]rune) {

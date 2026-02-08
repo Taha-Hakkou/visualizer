@@ -6,14 +6,14 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		return
 	}
 	if x1 == x2 {
-		pipes(canvas, x1, y1, y2)
+		pipes(canvas, x1+1, y1, y2)
 		return
 	}
 
-	if y2 < y1 {
-		y1, y2 = y2, y1
-		x1, x2 = x2, x1
-	}
+	// if y2 < y1 {
+	// 	y1, y2 = y2, y1
+	// 	x1, x2 = x2, x1
+	// }
 
 	var x, y int = x1, y1
 	var startWithPipes bool
@@ -28,18 +28,45 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 	if startWithPipes {
 		// pipes
 		x++ // to be aligned approprietaly with room name
-		var step int = 1
-		if x > x2 {
-			step = -1
-		}
-		for ; y2-y >= (x2-x)*step; y++ {
-			if canvas[y][x] == ' ' {
-				canvas[y][x] = '|'
+		if x2 > x {
+			if y2 > y {
+				if y2-y >= x2-x {
+					pipes(canvas, x, y, y2-x2+x+1) // no need to do y = y1
+					y = max(y, y2-x2+x+1)
+				}
+			} else {
+				if y-y2 >= x2-x {
+					pipes(canvas, x, y, y2+x2-x-1)
+					y = min(y, y2+x2-x-1)
+				}
+			}
+			if y != y1 { // check if the loop was entered
+				x++
+			}
+		} else {
+			// y2-y >= -(x2 - x)
+			for ; y <= y2+x2-x; y++ {
+				if canvas[y][x] == ' ' {
+					canvas[y][x] = '|'
+				}
+			}
+			if y != y1 { // check if the loop was entered
+				x--
 			}
 		}
-		if y != y1 { // check if the loop was entered
-			x += step
-		}
+
+		// var step int = 1
+		// if x > x2 {
+		// 	step = -1
+		// }
+		// for ; y2-y >= (x2-x)*step; y++ {
+		// 	if canvas[y][x] == ' ' {
+		// 		canvas[y][x] = '|'
+		// 	}
+		// }
+		// if y != y1 { // check if the loop was entered
+		// 	x += step
+		// }
 	} else {
 		// underscores
 		var step int = 1
@@ -72,9 +99,8 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		x--
 	} else {
 		// slashes
-		// tx := x
 		for ; y <= end && x >= x2; x-- {
-			if canvas[y][x] == ' ' || canvas[y][x] == '_' { // && tx != x {
+			if canvas[y][x] == ' ' || canvas[y][x] == '_' {
 				canvas[y][x] = '/' // x+1
 			}
 			y++

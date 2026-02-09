@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 // ---------- MAIN ----------
@@ -91,20 +92,22 @@ func main() {
 		drawLine(canvas, p1.x, p1.y, p2.x, p2.y)
 	}
 
+	flush(canvas)
+	action = true
 	Animate(canvas)
 }
 
 func Animate(canvas [][]rune) { // steps is global, make canvas global also !
-	flush(canvas)
-	// for _, step := range steps {
-	// 	for _, move := range step {
-	// 		room1 := rooms[move[0]]
-	// 		room2 := rooms[move[1]]
-	// 		drawMove(canvas, room1.x, room1.y, room2.x, room2.y)
-	// 	}
-	// 	time.Sleep(time.Second)
-	// 	flush(canvas)
-	// }
+	for _, step := range steps {
+		for _, move := range step {
+			room1 := rooms[move[0]]
+			room2 := rooms[move[1]]
+			// fmt.Println(1)
+			drawLine(canvas, (room1.x-minX)*scale, (room1.y-minY)*scale, (room2.x-minX)*scale, (room2.y-minY)*scale)
+		}
+		time.Sleep(time.Second)
+		// flush(canvas)
+	}
 }
 
 func flush(canvas [][]rune) {
@@ -116,3 +119,13 @@ func flush(canvas [][]rune) {
 		fmt.Println(line)
 	}
 }
+
+func reset() {
+	fmt.Printf("\033[%dA", height)
+}
+
+// \r        → start of line
+// \033[1A   → up 1 line
+// \033[1B   → down 1 line
+// \033[2K   → clear whole line
+// \033[K    → clear from cursor right

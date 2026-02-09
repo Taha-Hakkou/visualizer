@@ -30,3 +30,5 @@ var (
 	minX, maxX = math.MaxInt, math.MinInt
 	minY, maxY = math.MaxInt, math.MinInt
 )
+
+var action bool

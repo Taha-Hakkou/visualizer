@@ -10,17 +10,10 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		return
 	}
 
-	// if y2 < y1 {
-	// 	y1, y2 = y2, y1
-	// 	x1, x2 = x2, x1
-	// }
-
 	var x, y int = x1, y1
 	var startWithPipes bool
 
-	if y1+y2 > height || x1+x2 > width {
-		// works in 3 quarters of the map
-		// when using "and", will work only on 1 quarter
+	if y1+y2 < height && x1+x2 < width {
 		startWithPipes = true
 	}
 
@@ -31,276 +24,136 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		if x2 > x {
 			if y2 > y {
 				if y2-y >= x2-x {
-					pipes(canvas, x, y, y2-x2+x+1) // no need to do y = y1
-					y = max(y, y2-x2+x+1)
+					y = pipes(canvas, x, y, y2-x2+x+1) // no need to do y = y1
+					// y = max(y, y2-x2+x+1)
 				}
 			} else {
 				if y-y2 >= x2-x {
-					pipes(canvas, x, y, y2+x2-x-1)
-					y = min(y, y2+x2-x-1)
+					y = pipes(canvas, x, y, y2+x2-x-1)
+					// y = min(y, y2+x2-x-1)
 				}
 			}
-			if y != y1 { // check if the loop was entered
+			if y < y1-1 || y > y1+1 { // check if the loop was entered
 				x++
 			}
 		} else {
-			// y2-y >= -(x2 - x)
-			for ; y <= y2+x2-x; y++ {
-				if canvas[y][x] == ' ' {
-					canvas[y][x] = '|'
+			if y2 > y {
+				if y2-y >= x-x2 {
+					y = pipes(canvas, x, y, y2+x2-x+1) // no need to do y = y1
+					// y = max(y, y2+x2-x+1)
+				}
+			} else {
+				if y-y2 >= x-x2 {
+					y = pipes(canvas, x, y, y2-x2+x-1)
+					// y = min(y, y2-x2+x-1)
 				}
 			}
-			if y != y1 { // check if the loop was entered
+			if y < y1-1 || y > y1+1 { // check if the loop was entered
 				x--
 			}
 		}
-
-		// var step int = 1
-		// if x > x2 {
-		// 	step = -1
-		// }
-		// for ; y2-y >= (x2-x)*step; y++ {
-		// 	if canvas[y][x] == ' ' {
-		// 		canvas[y][x] = '|'
-		// 	}
-		// }
-		// if y != y1 { // check if the loop was entered
-		// 	x += step
-		// }
 	} else {
 		// underscores
-		var step int = 1
-		if x > x2 {
-			step = -1
-		}
-		for ; (x2-x)*step >= y2-y; x += step {
-			if canvas[y][x] == ' ' {
-				canvas[y][x] = '_'
+		if y2 > y {
+			if x2 > x {
+				if x2-x >= y2-y {
+					x = underscores(canvas, y, x, x2-y2+y+1) // no need to do y = y1
+					// x = max(x, x2-y2+y+1)
+				}
+			} else {
+				if x-x2 >= y2-y {
+					x = underscores(canvas, y, x, x2+y2-y-1)
+					// x = min(x, x2+y2-y-1)
+				}
 			}
-		}
-		if x != x1 { // check if the loop was entered
-			y++ // because x is incremented/decremented after the end of the loop
+			if x < x1-1 || x > x1+1 { // check if the loop was entered
+				y++
+			}
+		} else {
+			if x2 > x {
+				if x2-x >= y-y2 {
+					x = underscores(canvas, y, x, x2+y2-y+1) // no need to do y = y1
+					// x = max(x, x2+y2-y+1)
+				}
+			} else {
+				if x-x2 >= y-y2 {
+					x = underscores(canvas, y, x, x2-y2+y-1)
+					// x = min(x, x2-y2+y-1)
+				}
+			}
+			if x < x1-1 || x > x1+1 { // check if the loop was entered
+				y--
+			}
 		}
 	}
 
 	// 2: slashes & backslashes
-	var end int = y2 // just for pipe alignement
-	if !startWithPipes {
-		end = y2 - 1
+	var end int = x2     // for pipe alignement
+	if !startWithPipes { // end with pipes
+		end++
 	}
-	if x2 > x {
+	if (x2-x)*(y2-y) > 0 {
 		// backslashes
-		for ; y <= end && x <= x2; x++ {
-			if canvas[y][x] == ' ' || canvas[y][x] == '_' {
-				canvas[y][x] = '\\'
+		if x2 > x {
+			for ; y <= y2 && x <= end; x++ {
+				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
+					canvas[y][x] = '\\'
+				}
+				y++
 			}
-			y++
+			if startWithPipes {
+				y--
+			} // else doesnt matter -> we want x incremented for next step
+		} else {
+			for ; y > y2 && x > end; x-- {
+				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
+					canvas[y][x] = '\\'
+				}
+				y--
+			}
+			// if startWithPipes {
+			// 	y++
+			// }
 		}
-		x--
 	} else {
 		// slashes
-		for ; y <= end && x >= x2; x-- {
-			if canvas[y][x] == ' ' || canvas[y][x] == '_' {
-				canvas[y][x] = '/' // x+1
+		if x2 > x {
+			for ; y > y2 && x < end; x++ {
+				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
+					canvas[y][x] = '/'
+				}
+				y--
 			}
-			y++
+			// if startWithPipes { // doesnt matter if underscores !
+			// 	y++
+			// }
+		} else {
+			for ; y <= y2 && x >= end; x-- {
+				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
+					canvas[y][x] = '/'
+				}
+				y++
+			}
+			if startWithPipes {
+				y--
+			}
 		}
-		x++
 	}
-	y--
 
 	// 3
 	if startWithPipes {
 		// underscores
-		var step int = 1
-		if x > x2 {
-			step = -1
-		}
-		x += step
-		for ; (x2-x)*step > 0; x += step {
-			if canvas[y][x] == ' ' {
-				canvas[y][x] = '_'
-			}
-		}
-	} else {
-		// pipes
-		for ; y < y2; y++ {
-			if canvas[y][x] == ' ' {
-				canvas[y][x] = '|'
-			}
-		}
-	}
-}
-
-func drawMove(canvas [][]rune, x1, y1, x2, y2 int) {
-	// 1) Horizontal segment
-	if y1 == y2 {
-		step := 1
-		if x2 < x1 {
-			step = -1
-		}
-		var tmp rune
-		for x := x1 + 1; x != x2; x += step {
-			if canvas[y1][x-step] == '•' { // or using: tmp != 0
-				canvas[y1][x-step] = tmp
-			}
-			tmp = canvas[y1][x]
-			canvas[y1][x] = '•' // cell shouldnt be empty because already drawn
-		}
-		return
-	}
-
-	// 2) Vertical segment
-	if x1 == x2 {
-		step := 1
-		if y2 < y1 {
-			step = -1
-		}
-		var tmp rune
-		for y := y1 + 1; y != y2; y += step {
-			if canvas[y-step][x2+1] == '•' { // or using: tmp != 0
-				canvas[y-step][x2+1] = tmp
-			}
-			tmp = canvas[y][x2+1]
-			canvas[y][x2+1] = '•' // cell shouldnt be empty because already drawn
-		}
-		return
-	}
-
-	// 3)
-	// if y2 < y1 {
-	// 	y1, y2 = y2, y1
-	// 	x1, x2 = x2, x1
-	// } // dont change direction !
-
-	var x, y int = x1, y1
-
-	var startWithPipes bool
-	if y1+y2 > height || x1+x2 > width {
-		// works in 3 quarters of the map
-		// when using "and", will work only on 1 quarter
-		startWithPipes = true
-	}
-
-	var tmp rune
-
-	// 3.1
-	if startWithPipes {
-		// pipes
-		abs := x2 - x1
-		if abs < 0 {
-			abs *= -1
-		}
-		for ; y2-y > abs; y++ { // is it a valid condition ?
-			if canvas[y-1][x] == '•' {
-				canvas[y-1][x] = tmp
-			}
-			tmp = canvas[y][x]
-			canvas[y][x] = '•'
-		}
-	} else {
-		// underscores
-		if x2 > x1 {
-			for ; x2-x != y2-y1; x++ {
-				if canvas[y1][x] == '•' {
-					canvas[y1][x] = tmp
-				}
-				tmp = canvas[y1][x+1]
-				canvas[y1][x+1] = '•'
-			}
+		if x2 > x {
+			underscores(canvas, y, x-1, x2)
 		} else {
-			for ; x2-x != y1-y2; x-- { // (x2-x)/(y2-y1) != -1
-				if canvas[y1][x+1] == '•' {
-					canvas[y1][x+1] = tmp
-				}
-				tmp = canvas[y1][x]
-				canvas[y1][x] = '•'
-			}
-		}
-	}
-
-	// 3.2
-	// slashes & backslashes
-	step := 1
-	if y1 > y2 {
-		step = -1
-	}
-	if x2 > x1 {
-		if tmp == '_' {
-			x++
-			y += step
-			//
-			// if canvas[y-step][x-1] == '•' {
-			canvas[y-step][x-1] = tmp // sure it is a dot
-			// }
-			tmp = canvas[y][x]
-			canvas[y][x] = '•'
-		}
-		for ; y != y2+1; x++ {
-			canvas[y-step][x-1] = tmp // sure it is a dot
-			tmp = canvas[y][x]
-			canvas[y][x] = '•'
-			// if canvas[y][x] == ' ' || canvas[y][x] == '_' {
-			// 	canvas[y][x] = '\\'
-			// }
-			y += step
-		}
-	} else {
-		// tx := x
-		for ; y != y2+1; x-- {
-			canvas[y-step][x+2] = tmp // sure it is a dot
-			tmp = canvas[y][x+1]
-			canvas[y][x+1] = '•'
-			// if canvas[y][x+1] == ' ' || canvas[y][x+1] == '_' && tx != x {
-			// 	canvas[y][x+1] = '/'
-			// }
-			y += step
-		}
-	}
-
-	// 3.3
-	if startWithPipes {
-		// underscores
-		if x2 > x1 {
-			// x-- // no need because just a move !
-			// tmp = canvas[y][x]
-			for ; x < x2; x++ {
-				canvas[y][x] = tmp // where the dot is
-				tmp = canvas[y][x+1]
-				canvas[y][x+1] = '•'
-				// flush
-
-				// canvas[y][x] = tmp // sure it is a dot
-				// if canvas[y2][x] == ' ' {
-				// 	canvas[y2][x] = '_'
-				// }
-			}
-		} else {
-			// x++
-			for ; x > x2; x-- {
-				canvas[y][x] = tmp // where the dot is
-				tmp = canvas[y][x-1]
-				canvas[y][x-1] = '•'
-				// flush
-
-				// tmp = canvas[y][x+1]
-				// canvas[y][x+1] = '•'
-				// if canvas[y2][x] == ' ' {
-				// 	canvas[y2][x] = '_'
-				// }
-			}
+			underscores(canvas, y, x+1, x2)
 		}
 	} else {
 		// pipes
-		for ; y < y2; y++ {
-			canvas[y][x] = tmp // where the dot is
-			tmp = canvas[y+1][x]
-			canvas[y+1][x] = '•'
-			// flush
-
-			// if canvas[y][x] == ' ' {
-			// 	canvas[y][x] = '|'
-			// }
+		if y2 > y {
+			pipes(canvas, x, y-1, y2)
+		} else {
+			pipes(canvas, x, y+1, y2)
 		}
 	}
 }

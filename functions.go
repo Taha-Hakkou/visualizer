@@ -66,7 +66,7 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 					// x = min(x, x2+y2-y-1)
 				}
 			}
-			if x < x1-1 || x > x1+1 { // check if the loop was entered
+			if x < x1-1 || x > x1+1 { // only if going down after underscores.
 				y++
 			}
 		} else {
@@ -81,9 +81,9 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 					// x = min(x, x2-y2+y-1)
 				}
 			}
-			if x < x1-1 || x > x1+1 { // check if the loop was entered
-				y--
-			}
+			// if x < x1-1 || x > x1+1 { // check if the loop was entered
+			// 	y--
+			// }
 		}
 	}
 
@@ -153,7 +153,7 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		if y2 > y {
 			pipes(canvas, x, y-1, y2)
 		} else {
-			pipes(canvas, x, y+1, y2)
+			// pipes(canvas, x, y+1, y2)
 		}
 	}
 }

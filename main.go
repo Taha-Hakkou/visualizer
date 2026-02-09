@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -77,9 +78,6 @@ func main() {
 	// ---------- DRAW ROOMS ----------
 	for id, p := range pos {
 		label := fmt.Sprintf("[%s]", id)
-		// if id == start {
-		// 	label = "\033[31m" + label + "\033[0m" // ansi red
-		// }
 		for i, ch := range label {
 			canvas[p.y][p.x+i] = ch
 		}
@@ -97,16 +95,25 @@ func main() {
 	Animate(canvas)
 }
 
+func worker(canvas [][]rune, move [2]string, wg *sync.WaitGroup) {
+	defer wg.Done() // Signal the WaitGroup when this goroutine finishes
+
+	room1 := rooms[move[0]]
+	room2 := rooms[move[1]]
+	drawLine(canvas, (room1.x-minX)*scale, (room1.y-minY)*scale, (room2.x-minX)*scale, (room2.y-minY)*scale)
+}
+
 func Animate(canvas [][]rune) { // steps is global, make canvas global also !
 	for _, step := range steps {
+		var wg sync.WaitGroup
 		for _, move := range step {
-			room1 := rooms[move[0]]
-			room2 := rooms[move[1]]
-			// fmt.Println(1)
-			drawLine(canvas, (room1.x-minX)*scale, (room1.y-minY)*scale, (room2.x-minX)*scale, (room2.y-minY)*scale)
+			wg.Add(1)
+			go worker(canvas, move, &wg)
 		}
+		wg.Wait()
 		time.Sleep(time.Second)
-		// flush(canvas)
+		reset()
+		flush(canvas)
 	}
 }
 

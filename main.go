@@ -103,6 +103,8 @@ func worker(canvas [][]rune, move [2]string, wg *sync.WaitGroup) {
 	drawLine(canvas, (room1.x-minX)*scale, (room1.y-minY)*scale, (room2.x-minX)*scale, (room2.y-minY)*scale)
 }
 
+var m sync.Mutex
+
 func Animate(canvas [][]rune) { // steps is global, make canvas global also !
 	for _, step := range steps {
 		var wg sync.WaitGroup
@@ -111,7 +113,7 @@ func Animate(canvas [][]rune) { // steps is global, make canvas global also !
 			go worker(canvas, move, &wg)
 		}
 		wg.Wait()
-		time.Sleep(time.Second)
+		time.Sleep(2 * time.Second)
 		reset()
 		flush(canvas)
 	}

@@ -25,12 +25,10 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 			if y2 > y {
 				if y2-y >= x2-x {
 					y = pipes(canvas, x, y, y2-x2+x+1) // no need to do y = y1
-					// y = max(y, y2-x2+x+1)
 				}
 			} else {
 				if y-y2 >= x2-x {
 					y = pipes(canvas, x, y, y2+x2-x-1)
-					// y = min(y, y2+x2-x-1)
 				}
 			}
 			if y < y1-1 || y > y1+1 { // check if the loop was entered
@@ -40,12 +38,10 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 			if y2 > y {
 				if y2-y >= x-x2 {
 					y = pipes(canvas, x, y, y2+x2-x+1) // no need to do y = y1
-					// y = max(y, y2+x2-x+1)
 				}
 			} else {
 				if y-y2 >= x-x2 {
 					y = pipes(canvas, x, y, y2-x2+x-1)
-					// y = min(y, y2-x2+x-1)
 				}
 			}
 			if y < y1-1 || y > y1+1 { // check if the loop was entered
@@ -58,12 +54,10 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 			if x2 > x {
 				if x2-x >= y2-y {
 					x = underscores(canvas, y, x, x2-y2+y+1) // no need to do y = y1
-					// x = max(x, x2-y2+y+1)
 				}
 			} else {
 				if x-x2 >= y2-y {
 					x = underscores(canvas, y, x, x2+y2-y-1)
-					// x = min(x, x2+y2-y-1)
 				}
 			}
 			if x < x1-1 || x > x1+1 { // only if going down after underscores.
@@ -73,12 +67,10 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 			if x2 > x {
 				if x2-x >= y-y2 {
 					x = underscores(canvas, y, x, x2+y2-y+1) // no need to do y = y1
-					// x = max(x, x2+y2-y+1)
 				}
 			} else {
 				if x-x2 >= y-y2 {
 					x = underscores(canvas, y, x, x2-y2+y-1)
-					// x = min(x, x2-y2+y-1)
 				}
 			}
 			// if x < x1-1 || x > x1+1 { // check if the loop was entered
@@ -94,50 +86,10 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 	}
 	if (x2-x)*(y2-y) > 0 {
 		// backslashes
-		if x2 > x {
-			for ; y <= y2 && x <= end; x++ {
-				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
-					canvas[y][x] = '\\'
-				}
-				y++
-			}
-			if startWithPipes {
-				y--
-			} // else doesnt matter -> we want x incremented for next step
-		} else {
-			for ; y > y2 && x > end; x-- {
-				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
-					canvas[y][x] = '\\'
-				}
-				y--
-			}
-			// if startWithPipes {
-			// 	y++
-			// }
-		}
+		x, y = backslashes(canvas, x, y, end, y2)
 	} else {
 		// slashes
-		if x2 > x {
-			for ; y > y2 && x < end; x++ {
-				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
-					canvas[y][x] = '/'
-				}
-				y--
-			}
-			// if startWithPipes { // doesnt matter if underscores !
-			// 	y++
-			// }
-		} else {
-			for ; y <= y2 && x >= end; x-- {
-				if canvas[y][x] == ' ' || canvas[y][x] == '_' {
-					canvas[y][x] = '/'
-				}
-				y++
-			}
-			if startWithPipes {
-				y--
-			}
-		}
+		x, y = slashes(canvas, x, y, end, y2) // end necessary ?
 	}
 
 	// 3
@@ -153,7 +105,7 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 		if y2 > y {
 			pipes(canvas, x, y-1, y2)
 		} else {
-			// pipes(canvas, x, y+1, y2)
+			pipes(canvas, x, y+1, y2)
 		}
 	}
 }

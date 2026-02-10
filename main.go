@@ -5,8 +5,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"sync"
-	"time"
 )
 
 // ---------- MAIN ----------
@@ -94,47 +92,3 @@ func main() {
 	action = true
 	Animate(canvas)
 }
-
-func worker(canvas [][]rune, move [2]string, wg *sync.WaitGroup) {
-	defer wg.Done() // Signal the WaitGroup when this goroutine finishes
-
-	room1 := rooms[move[0]]
-	room2 := rooms[move[1]]
-	drawLine(canvas, (room1.x-minX)*scale, (room1.y-minY)*scale, (room2.x-minX)*scale, (room2.y-minY)*scale)
-}
-
-var m sync.Mutex
-
-func Animate(canvas [][]rune) { // steps is global, make canvas global also !
-	for _, step := range steps {
-		var wg sync.WaitGroup
-		for _, move := range step {
-			wg.Add(1)
-			go worker(canvas, move, &wg)
-		}
-		wg.Wait()
-		time.Sleep(2 * time.Second)
-		reset()
-		flush(canvas)
-	}
-}
-
-func flush(canvas [][]rune) {
-	// ---------- PRINT ----------
-	for _, row := range canvas {
-		line := string(row)
-		line = strings.Replace(line, "["+start+"]", "\033[31m"+"["+start+"]"+"\033[0m", 1) // red ansi
-		line = strings.Replace(line, "["+end+"]", "\033[32m"+"["+end+"]"+"\033[0m", 1)     // green ansi
-		fmt.Println(line)
-	}
-}
-
-func reset() {
-	fmt.Printf("\033[%dA", height)
-}
-
-// \r        → start of line
-// \033[1A   → up 1 line
-// \033[1B   → down 1 line
-// \033[2K   → clear whole line
-// \033[K    → clear from cursor right

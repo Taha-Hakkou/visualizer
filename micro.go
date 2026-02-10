@@ -102,15 +102,8 @@ func slashes(canvas [][]rune, x, y, x2, y2 int) (int, int) {
 	return x, y
 }
 
-// ======================================================
-
-func deplace(canvas [][]rune, x, y int) {
-	tmp := canvas[y][x]
-	canvas[y][x] = '•' // '🐜'
-	m.Lock()
-	reset()
-	flush(canvas)
-	m.Unlock()
-	time.Sleep(SLEEP)
-	canvas[y][x] = tmp
-}
+// TODO:
+// 	- move directions
+//  - worker sync
+//  - handling errors from lem-in
+//  - examples out of range

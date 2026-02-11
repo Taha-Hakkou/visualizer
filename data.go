@@ -22,7 +22,7 @@ var steps = [][][2]string{}
 // ---------- NORMALIZE ----------
 var (
 	width, height int
-	scale         = 3
+	scale         = 4
 )
 
 // do not start from big numbers !!!!!!!!!!!!!!! (do i even need them)

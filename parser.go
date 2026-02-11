@@ -27,6 +27,8 @@ func parseData(lines []string) {
 			start = strings.Split(lines[i+1], " ")[0]
 		} else if lines[i] == "##end" {
 			end = strings.Split(lines[i+1], " ")[0]
+		} else if strings.HasPrefix(lines[i], "#") {
+			continue
 		} else {
 			break
 		}

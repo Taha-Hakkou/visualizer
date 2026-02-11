@@ -8,25 +8,28 @@ import (
 	"time"
 )
 
-var currentRooms = make(map[int]string)
+var (
+	currentRooms = make(map[int]string)
+	m            sync.Mutex
+)
 
 func worker(canvas [][]rune, move [2]string, wg *sync.WaitGroup) {
 	defer wg.Done() // Signal the WaitGroup when this goroutine finishes
 
 	antId, _ := strconv.Atoi(move[0])
+	m.Lock()
 	roomname, ok := currentRooms[antId]
+	currentRooms[antId] = move[1]
+	m.Unlock()
 	if !ok {
 		roomname = start
 	}
 	room1 := rooms[roomname]
 	room2 := rooms[move[1]]
-	currentRooms[antId] = move[1]
 	x1, y1 := (room1.x-minX)*scale, (room1.y-minY)*scale
 	x2, y2 := (room2.x-minX)*scale, (room2.y-minY)*scale
 	drawLine(canvas, x1, y1, x2, y2)
 }
-
-var m sync.Mutex
 
 func Animate(canvas [][]rune) { // steps is global, make canvas global also !
 	for _, step := range steps {
@@ -62,10 +65,15 @@ func reset() {
 // \033[2K   → clear whole line
 // \033[K    → clear from cursor right
 
+var changingCells = []string{}
+
 func deplace(canvas [][]rune, x, y int) {
-	m.Lock()
+	for canvas[y][x] == '•' {
+		time.Sleep(100 * time.Millisecond)
+	}
 	tmp := canvas[y][x]
 	canvas[y][x] = '•' // '🐜'
+	m.Lock()
 	reset()
 	flush(canvas)
 	m.Unlock()

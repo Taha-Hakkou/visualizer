@@ -101,9 +101,3 @@ func slashes(canvas [][]rune, x, y, x2, y2 int) (int, int) {
 	// must be implemented
 	return x, y
 }
-
-// TODO:
-// 	- move directions
-//  - worker sync
-//  - handling errors from lem-in
-//  - examples out of range

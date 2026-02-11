@@ -7,7 +7,12 @@ import (
 	"strings"
 )
 
-// ---------- MAIN ----------
+// TODO:
+// 	- move directions
+//  - worker sync
+//  - handling errors from lem-in
+//  - examples out of range
+
 func main() {
 	// check whether stdin is coming from a pipe/file or from a terminal (TTY)
 	stat, _ := os.Stdin.Stat()
@@ -49,19 +54,19 @@ func main() {
 		gy := (p.y - minY) * scale // to invert Y, use (maxY - p.y) instead
 		pos[id] = Room{gx, gy}     // is id converted implicitly ???
 	}
+	// fmt.Println(pos)
 
 	// ---------- CANVAS ----------
-	for _, p := range pos {
-		if p.x > width {
-			width = p.x
+	for id, p := range pos {
+		var w int = p.x + 2 + len(id) // 2 = opening & closing brackets
+		if w > width {
+			width = w
 		}
-		if p.y > height {
-			height = p.y
+		if p.y+1 > height {
+			height = p.y + 1
 		}
 	}
-	// min to add. why ????
-	width += 3
-	height += 1 // adding to width and height in case some lines go beyond !
+	// fmt.Println(height, width)
 
 	canvas := make([][]rune, height)
 	for i := range canvas {

@@ -13,9 +13,17 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 	var x, y int = x1, y1
 	var startWithPipes bool
 
-	if y1+y2 < height && x1+x2 < width {
+	// ------------------------------------
+	// if y1+y2 < height && x1+x2 < width {
+	// 	startWithPipes = true
+	// }
+	if y1+y2 >= height {
 		startWithPipes = true
 	}
+	if y2 < y1 {
+		startWithPipes = !startWithPipes
+	}
+	// ------------------------------------
 
 	// 1
 	if startWithPipes {
@@ -87,9 +95,15 @@ func drawLine(canvas [][]rune, x1, y1, x2, y2 int) {
 	if (x2-x)*(y2-y) > 0 {
 		// backslashes
 		x, y = backslashes(canvas, x, y, end, y2)
+		// if startWithPipes {
+		// 	y++
+		// }
 	} else {
 		// slashes
 		x, y = slashes(canvas, x, y, end, y2) // end necessary ?
+		// if startWithPipes {
+		// 	y++
+		// }
 	}
 
 	// 3

@@ -9,9 +9,7 @@ import (
 
 // TODO:
 // 	- move directions
-//  - worker sync
 //  - handling errors from lem-in
-//  - examples out of range
 
 func main() {
 	// check whether stdin is coming from a pipe/file or from a terminal (TTY)

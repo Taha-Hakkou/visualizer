@@ -31,7 +31,7 @@ func pipes(canvas [][]rune, x, y1, y2 int) int {
 		// moved 1 cell to the right to be appropriately aligned
 		if action {
 			deplace(canvas, x, y)
-		} else if canvas[y][x] == ' ' {
+		} else if canvas[y][x] == ' ' || canvas[y][x] == '-' || canvas[y][x] == '_' || canvas[y][x] == '/' || canvas[y][x] == '\\' {
 			canvas[y][x] = '|'
 		}
 	}
@@ -49,7 +49,7 @@ func underscores(canvas [][]rune, y, x1, x2 int) int {
 		// check because room name takes more than a cell
 		if action {
 			deplace(canvas, x, y)
-		} else if canvas[y][x] == ' ' {
+		} else if canvas[y][x] == ' ' || canvas[y][x] == '-' {
 			canvas[y][x] = '_'
 		}
 	}
@@ -66,16 +66,20 @@ func backslashes(canvas [][]rune, x, y, x2, y2 int) (int, int) {
 	for (y2-y)*step > 0 && (x2-x)*step > 0 { // or equal (if step = 1): not implemented
 		if action {
 			deplace(canvas, x, y)
-		} else if canvas[y][x] == ' ' || canvas[y][x] == '_' {
+		} else if canvas[y][x] == ' ' || canvas[y][x] == '_' || canvas[y][x] == '-' {
 			canvas[y][x] = '\\'
 		}
 		x += step
 		y += step
 	}
-	// if step == 1 && startWithPipes {
-	// 	y--
-	// }
-	// must be implemented
+	if step == 1 {
+		if action {
+			deplace(canvas, x, y)
+		} else if canvas[y][x] == ' ' || canvas[y][x] == '_' || canvas[y][x] == '-' {
+			canvas[y][x] = '\\'
+		}
+		x++
+	}
 	return x, y
 }
 
@@ -89,15 +93,19 @@ func slashes(canvas [][]rune, x, y, x2, y2 int) (int, int) {
 	for (x2-x)*step > 0 && (y2-y)*step < 0 { // or equal (if step = -1): not implemented
 		if action {
 			deplace(canvas, x, y)
-		} else if canvas[y][x] == ' ' || canvas[y][x] == '_' {
+		} else if canvas[y][x] == ' ' || canvas[y][x] == '_' || canvas[y][x] == '-' {
 			canvas[y][x] = '/'
 		}
 		x += step
 		y -= step
 	}
-	// if step == -1 && startWithPipes {
-	// 	y--
-	// }
-	// must be implemented
+	if step == -1 {
+		if action {
+			deplace(canvas, x, y)
+		} else if canvas[y][x] == ' ' || canvas[y][x] == '_' || canvas[y][x] == '-' {
+			canvas[y][x] = '/'
+		}
+		x--
+	}
 	return x, y
 }
